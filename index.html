@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="cv" style="border:1px solid #333;"></canvas>
+    <script>
+        var isTouchDevice = 'ontouchstart' in document.documentElement;
+        console.log(isTouchDevice);
+        var cv = document.getElementById("cv");
+        cv.height = document.documentElement.clientHeight;
+        cv.width = document.documentElement.clientWidth
+        var ctx = cv.getContext('2d');
+        let last = []
+        let drawLine = function (x1, y1, x2, y2) {
+            ctx.beginPath();//开始绘制线条，若不使用beginPath，则不能绘制多条线条
+            ctx.moveTo(x1, y1);//线条开始位置
+            ctx.lineTo(x2, y2);//线条经过点
+            ctx.closePath();
+            ctx.lineWidth = 5;//设置线条宽度
+            ctx.stroke();//用于绘制线条
+        }
+
+        if (isTouchDevice) {
+            cv.ontouchstart = (e) => {
+                let x = e.touches[0].clientX
+                let y = e.touches[0].clientY
+                last = [x, y]
+            }
+            cv.ontouchmove = (e) => {
+                let x = e.touches[0].clientX
+                let y = e.touches[0].clientY
+                drawLine(last[0], last[1], x, y)
+                last = [x, y]
+            }
+        } else {
+            cv.onmousedown = function (ev) {
+                var ev = ev || window.event;
+                ctx.moveTo(ev.clientX - cv.offsetLeft, ev.clientY - cv.offsetTop);
+                document.onmousemove = function (ev) {
+                    var ev = ev || window.event;
+                    ctx.lineTo(ev.clientX - cv.offsetLeft, ev.clientY - cv.offsetTop);
+                    ctx.stroke();
+                }
+                document.onmouseup = function () {
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                }
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
